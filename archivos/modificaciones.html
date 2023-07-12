@@ -98,7 +98,7 @@
                     // Ejecutar validaciones y cancela el envio en caso de error
                     const val = this.validate(producto);
                     if (!val.success) {
-                        let msg = ['Error al enviar el formilario:'];
+                        let msg = ['Error al enviar el formulario:'];
                         msg = msg.concat(val.errors.map(err => ' - ' + err));
 
                         alert(msg.join("\n"));
