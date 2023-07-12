@@ -76,7 +76,6 @@
   </div>
 
   <script>
-    //const URL = "http://127.0.0.1:5000/"
     const URL = "http://arturo398.pythonanywhere.com/"
 
     //Utilizamos Vue.createApp para crear nuestra aplicación Vue.
@@ -126,7 +125,15 @@
           //Parsear la respuesta en formato JSON y mostrar una alerta con el mensaje devuelto por la API.
             .then(response => response.json())
             .then(data => {
-              alert(data.message)
+              if (this.mostrarCarrito) {
+                this.obtenerCarrito();
+              }
+
+              const prodAdded = this.productos.find(prod => prod.codigo == producto.codigo);
+              const index = this.productos.indexOf(prodAdded);
+              this.productos[index].cantidad = this.productos[index].cantidad > 0 ? this.productos[index].cantidad - 1 : 0;
+
+              alert(data.message);
             })
             //En caso de que ocurra algún error durante la solicitud GET, el catch se ejecutará y se mostrará una alerta de error.
             .catch(error => {
@@ -150,7 +157,15 @@
           //Parsear la respuesta en formato JSON y mostrar una alerta con el mensaje devuelto por la API.
             .then(response => response.json())
             .then(data => {
-              alert(data.message)
+              this.obtenerCarrito();
+
+              if (data.message != "El producto no se encuentra en el carrito.") {
+                const prodAdded = this.productos.find(prod => prod.codigo == producto.codigo);
+                const index = this.productos.indexOf(prodAdded);
+                this.productos[index].cantidad = this.productos[index].cantidad + 1;
+              }
+
+              alert(data.message);
             })
             //En caso de que ocurra algún error durante la solicitud GET, el catch se ejecutará y se mostrará una alerta de error.
             .catch(error => {
