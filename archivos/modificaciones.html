@@ -42,7 +42,6 @@
 
     <script src="https://unpkg.com/vue@next"></script>
     <script>
-        //const URL = "http://127.0.0.1:5000/"
         const URL = "http://arturo398.pythonanywhere.com/"
 
         //Vue.createApp para crear nuestra aplicación Vue.
@@ -55,7 +54,8 @@
                     mostrarDatosProducto: false,
                     descripcion: '',
                     cantidad: '',
-                    precio: ''
+                    precio: '', 
+                    errors: []
                 }
             },
 
@@ -95,6 +95,17 @@
                         precio: this.precio
                     }
 
+                    // Ejecutar validaciones y cancela el envio en caso de error
+                    const val = this.validate(producto);
+                    if (!val.success) {
+                        let msg = ['Error al enviar el formilario:'];
+                        msg = msg.concat(val.errors.map(err => ' - ' + err));
+
+                        alert(msg.join("\n"));
+
+                        return;
+                    }
+
                     //Utilizamos fetch para realizar una solicitud PUT a la API y guardar los cambios.
                     fetch(URL + 'productos/' + this.codigo, {
                         method: 'PUT',
@@ -123,6 +134,84 @@
                             //En caso de que ocurra algún error durante la solicitud PUT, el catch se ejecutará y se mostrará una alerta de error.
                             alert('Error al guardar los cambios del producto.')
                         })
+                }, 
+
+                validate(producto) {
+                    this.errors = [];
+
+                    this.errors = this.errors.concat(this.validateDescripcion((producto.descripcion)));
+                    this.errors = this.errors.concat(this.validateCantidad((producto.cantidad)));
+                    this.errors = this.errors.concat(this.validatePrecio((producto.precio)));
+
+                    return {
+                        success: this.errors.length == 0 ? true : false, 
+                        errors: this.errors
+                    };
+                }, 
+
+                validateDescripcion(descripcion) {
+                    let res = [];
+
+                    if (!descripcion) {
+                        res.push('El campo descripción es requerido');
+                    }
+
+                    if (descripcion.length < 10) {
+                        res.push('El campo descripción debe tener al menos 10 caracteres');
+                    }
+
+                    if (descripcion.length > 60) {
+                        res.push('El campo descripción debe tener como máximo 60 caracteres');
+                    }
+
+                    return res;
+                }, 
+
+                validateCantidad(cantidad) {
+                    let res = [];
+
+                    if (!cantidad) {
+                        res.push('El campo cantidad es requerido');
+                    }
+
+                    console.log(cantidad);
+
+                    if (!this.isNumeric(cantidad)) {
+                        res.push('El campo cantidad debe ser un número entero');
+                    }
+
+                    if (!Number.isInteger(Number(cantidad))) {
+                        res.push('El campo cantidad debe ser un número entero');
+                    }
+
+                    if (cantidad < 0) {
+                        res.push('El campo cantidad debe ser al menos 0');
+                    }
+
+                    return res;
+                }, 
+
+                validatePrecio(precio) {
+                    let res = [];
+
+                    if (!precio) {
+                        res.push('El campo precio es requerido');
+                    }
+
+                    if (!this.isNumeric(precio)) {
+                        res.push('El campo precio debe ser un número');
+                    }
+
+                    if (precio < 0) {
+                        res.push('El campo precio debe ser al menos 0');
+                    }
+
+                    return res;
+                }, 
+
+                isNumeric(str) {                    
+                    return  !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+                            !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
                 }
             }
         })
