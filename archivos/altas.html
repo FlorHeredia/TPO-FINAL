@@ -15,16 +15,16 @@
     <h3>Codo a Codo 2023</h3>
     <form id="formulario">
         <label for="codigo">Código:</label>
-        <input type="text" id="codigo" name="codigo" required><br>
+        <input type="text" id="codigo" name="codigo"><br>
 
         <label for="descripcion">Descripción:</label>
-        <input type="text" id="descripcion" name="descripcion" required><br>
+        <input type="text" id="descripcion" name="descripcion"><br>
 
         <label for="cantidad">Cantidad:</label>
-        <input type="number" id="cantidad" name="cantidad" required><br>
+        <input type="number" id="cantidad" name="cantidad"><br>
 
         <label for="precio">Precio:</label>
-        <input type="number" step="0.01" id="precio" name="precio" required><br>
+        <input type="number" step="0.01" id="precio" name="precio"><br>
 
         <button type="submit">Agregar Producto</button>
         <a href="index.html">Menu principal</a>
@@ -34,10 +34,9 @@
 // Este script maneja el evento de envío del formulario, obtiene los valores ingresados por el usuario, realiza una solicitud POST al servidor con los datos del producto y maneja la respuesta del servidor.
 
 
-        //const URL = "http://127.0.0.1:5000/"
         const URL = "http://arturo398.pythonanywhere.com/"
         // Capturamos el evento de envío del formulario
-        document.getElementById('formulario').addEventListener('submit', function (event) {
+        document.getElementById('formulario').addEventListener('submit', async function (event) {
             event.preventDefault(); // Evitamos que se envie el form por ahora
 
             // Obtenemos los valores del formulario
@@ -53,43 +52,151 @@
                 cantidad: cantidad,
                 precio: precio
             };
-            console.log(producto)
-            // Realizamos la solicitud POST al servidor
-            fetch(URL + 'productos', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json' //indica que se están enviando datos en formato JSON
-                },
-                //Se convierte el objeto producto a JSON utilizando JSON.stringify() antes de enviarlo como cuerpo de la solicitud.
-                body: JSON.stringify(producto) 
-            })
             
-            //Después de realizar la solicitud POST, se utiliza el método then() para manejar la respuesta del servidor.
-                .then(function (response) {
-                    // Código para manejar la respuesta
-                    if (response.ok) {
-                        return response.json(); // Parseamos la respuesta JSON
-                    } else {
-                        // Si hubo un error, lanzar explícitamente una excepción
-                        // para ser "catcheada" más adelante
-                        throw new Error('Error al agregar el producto.');
-                    }
-                })
-                
-                //Respuesta OK, se limpia formulario.
-                .then(function (data) {
+            // Ejecutar validaciones y cancela el envio en caso de error
+            const val = validate(producto);
+            if (!val.success) {
+                let msg = ['Error al enviar el formilario:'];
+                msg = msg.concat(val.errors.map(err => ' - ' + err));
+
+                alert(msg.join("\n"));
+
+                return;
+            }
+
+            // Realizamos la solicitud POST al servidor
+            try {
+                let response = await fetch(URL + 'productos', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json' //indica que se están enviando datos en formato JSON
+                    },
+                    //Se convierte el objeto producto a JSON utilizando JSON.stringify() antes de enviarlo como cuerpo de la solicitud.
+                    body: JSON.stringify(producto) 
+                });
+
+                if (response.ok) {
+                    response = await response.json(); // Parseamos la respuesta JSON
+
                     alert('Producto agregado correctamente.'); 
                     //Limpiamos el formulario.
                     document.getElementById('codigo').value = "";
                     document.getElementById('descripcion').value = "";
                     document.getElementById('cantidad').value = "";
                     document.getElementById('precio').value = "";
-                })
-                .catch(function (error) {
-                    // Código para manejar errores
-                    alert('Error al agregar el producto.');
-                });
+                } else {
+                    // Si hubo un error, lanzar explícitamente una excepción
+                    // para ser "catcheada" más adelante
+                    throw new Error('Error al agregar el producto.');
+                }
+            } catch (err) {
+                alert('Error al agregar el producto.');
+            }
         })
+    
+        let globalErrors = [];
+        const validate = (producto) => {
+            globalErrors = [];
+
+            globalErrors = globalErrors.concat(validateCodigo((producto.codigo)));
+            globalErrors = globalErrors.concat(validateDescripcion((producto.descripcion)));
+            globalErrors = globalErrors.concat(validateCantidad((producto.cantidad)));
+            globalErrors = globalErrors.concat(validatePrecio((producto.precio)));
+
+            return {
+                success: globalErrors.length == 0 ? true : false, 
+                errors: globalErrors
+            };
+        }
+
+        const validateCodigo = (codigo) => {
+            let res = [];
+
+            if (!codigo) {
+                res.push('El campo código es requerido');
+            }
+
+            if (!isAlphanumeric(codigo)) {
+                res.push('El campo código debe ser alfanumérico');
+            }
+
+            if (codigo.length < 3) {
+                res.push('El campo código debe tener al menos 3 caracteres');
+            }
+
+            if (codigo.length > 8) {
+                res.push('El campo código debe tener como máximo 8 caracteres');
+            }
+
+            return res;
+        }
+
+        const validateDescripcion = (descripcion) => {
+            let res = [];
+
+            if (!descripcion) {
+                res.push('El campo descripción es requerido');
+            }
+
+            if (descripcion.length < 10) {
+                res.push('El campo descripción debe tener al menos 10 caracteres');
+            }
+
+            if (descripcion.length > 60) {
+                res.push('El campo descripción debe tener como máximo 60 caracteres');
+            }
+
+            return res;
+        }
+
+        const validateCantidad = (cantidad) => {
+            let res = [];
+
+            if (!cantidad) {
+                res.push('El campo cantidad es requerido');
+            }
+
+            if (!isNumeric(cantidad)) {
+                res.push('El campo cantidad debe ser un número entero');
+            }
+
+            if (!Number.isInteger(Number(cantidad))) {
+                res.push('El campo cantidad debe ser un número entero');
+            }
+
+            if (cantidad < 0) {
+                res.push('El campo cantidad debe ser al menos 0');
+            }
+
+            return res;
+        }
+
+        const validatePrecio = (precio) => {
+            let res = [];
+
+            if (!precio) {
+                res.push('El campo precio es requerido');
+            }
+
+            if (!isNumeric(precio)) {
+                res.push('El campo precio debe ser un número');
+            }
+
+            if (precio < 0) {
+                res.push('El campo precio debe ser al menos 0');
+            }
+
+            return res;
+        }
+
+        function isAlphanumeric(str) {
+            return /^[a-zA-Z0-9]+$/.test(str);
+        }
+
+        function isNumeric(str) {
+            return  !isNaN(str) && // use type coercion to parse the _entirety_ of the string (`parseFloat` alone does not do this)...
+                    !isNaN(parseFloat(str)) // ...and ensure strings of whitespace fail
+        }
     </script>
 </body>
 
