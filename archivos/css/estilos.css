@@ -1,7 +1,11 @@
 /* Estilos para todo el proyecto */
 body {
     font-family: Arial, sans-serif;
-    background-color: #f9f9f9;
+    background-color: #F4DFD0;
+    background-image: url(../img/23985732_6893861.jpg);
+    background-position: center;
+    background-size:cover;
+    
 }
 
 .contenedor-centrado {
@@ -12,7 +16,7 @@ body {
 
 p {
     font-family: 'Times New Roman', Times, serif;
-    background-color: #f9f9f9;
+    background-color: #F4DFD0;
     max-width: 400px;
     margin: 0 auto;
     padding: 20px;
@@ -20,7 +24,7 @@ p {
 
 h1, h2, h3, h4, h5, h6 {
     text-align: center;
-    color: #007bff;
+    color: #AC7088;
 }
 
 .img {
@@ -33,8 +37,8 @@ form {
     max-width: 400px;
     margin: 0 auto;
     padding: 20px;
-    background-color: white;
-    border: 1px solid lightslategray;
+    background-color: #DEB6AB;
+    border: 1px solid #AC7088;
     border-radius: 5px;
 }
 
@@ -42,8 +46,8 @@ table {
     max-width: 90%;
     margin: 0 auto;
     padding: 20px;
-    background-color: white;
-    border: 1px solid lightslategray;
+    background-color: #DEB6AB;
+    border: 1px solid #AC7088;
     border-radius: 5px;
 }
 
@@ -64,36 +68,36 @@ textarea {
 
 input[type="submit"] {
     padding: 10px;
-    background-color: #007bff;
-    color: #ffffff;
+    background-color: #AC7088;
+    color: black;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
 input[type="submit"]:hover {
-    background-color: #0056b3;
+    background-color: #AC7088;
 }
 
 button {
     padding: 8px;
     margin:4px;
-    background-color: #007bff;
-    color: #ffffff;
+    background-color:#AC7088;
+    color: black;
     border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color:#ffffff;
 }
 
 a {
     padding: 8px;
     margin:4px;
-    background-color: #fdab13;
-    color: #ffffff;
+    background-color: #F5E8C7;
+    color: black;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -102,5 +106,5 @@ a {
 }
 
 a:hover {
-    background-color: #cd7b00;
+    background-color:#ffffff;
 }
